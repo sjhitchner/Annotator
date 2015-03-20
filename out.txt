@@ -1,0 +1,23 @@
+
+=== Test create, fetch, update ===
+name [alex] not foundname [alex] not foundHTTP status code: 404
+
+=== Test simple annotation ===
+415: Unsupported Media Type
+
+=== Test annotation of multiple names ===
+415: Unsupported Media Type
+415: Unsupported Media Type
+
+=== Test HTML correctness ===
+415: Unsupported Media Type
+415: Unsupported Media Type
+415: Unsupported Media Type
+
+=== Test additional annotations ===
+415: Unsupported Media Type
+415: Unsupported Media Type
+415: Unsupported Media Type
+
+=== Test annotation of complex example ===
+415: Unsupported Media Type
