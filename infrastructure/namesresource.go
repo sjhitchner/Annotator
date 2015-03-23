@@ -70,13 +70,13 @@ func (t namesResourceImpl) UpdateURLForName(request *restful.Request, response *
 		return
 	}
 
-	var url URL
-	if err := request.ReadEntity(&url); err != nil {
+	var nameRequest NameUrlRequest
+	if err := request.ReadEntity(&nameRequest); err != nil {
 		ERROR(response, err)
 		return
 	}
 
-	if err := t.interactor.UpdateURLForName(name, url); err != nil {
+	if err := t.interactor.UpdateURLForName(name, nameRequest.URL); err != nil {
 		ERROR(response, err)
 		return
 	}

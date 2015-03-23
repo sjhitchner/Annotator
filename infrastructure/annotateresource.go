@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"github.com/emicklei/go-restful"
 	uc "github.com/sjhitchner/sourcegraph/usecases"
+	"log"
 )
 
 type AnnotateRequest struct {
@@ -22,9 +23,9 @@ func NewAnnotateResource(interactor uc.AnnotateInteractor) AnnotateResource {
 func (t annotateResourceImpl) Register(container *restful.Container) {
 	ws := new(restful.WebService)
 	ws.Path("/annotate").
-		Doc("Manage Names").
-		Consumes("plain/html").
-		Produces("plain/html")
+		Doc("Manage Annotations")
+	//("plain/html", "").
+	//Produces("plain/html")
 
 	ws.Route(ws.POST("").To(t.AnnotateHTML).
 		Doc("update a url for name").
@@ -37,5 +38,5 @@ func (t annotateResourceImpl) Register(container *restful.Container) {
 }
 
 func (t annotateResourceImpl) AnnotateHTML(request *restful.Request, response *restful.Response) {
-
+	log.Println("annotate")
 }
