@@ -1,7 +1,7 @@
 package infrastructure
 
 import (
-	"github.com/emicklei/go-restful"
+	"github.com/gorilla/mux"
 	. "github.com/sjhitchner/sourcegraph/domain"
 	//. "github.com/sjhitchner/sourcegraph/usecases"
 	"bytes"
@@ -13,16 +13,16 @@ import (
 	"testing"
 )
 
-func NewTestServer(container *restful.Container) *httptest.Server {
+func NewTestServer(router *mux.Router) *httptest.Server {
 	ts := httptest.NewServer(container)
 	return ts
 }
 
 func NewNamesServer() *httptest.Server {
-	container := restful.NewContainer()
+	router := mux.NewRouter()
 	resource := NewNamesResource(NewMockNamesInteractor())
-	resource.Register(container)
-	return NewTestServer(container)
+	resource.Register(router)
+	return NewTestServer(router)
 }
 
 /*

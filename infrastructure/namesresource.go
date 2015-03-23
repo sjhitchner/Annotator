@@ -1,9 +1,15 @@
 package infrastructure
 
 import (
-	"github.com/emicklei/go-restful"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"github.com/gorilla/mux"
 	. "github.com/sjhitchner/sourcegraph/domain"
 	uc "github.com/sjhitchner/sourcegraph/usecases"
+	"io/ioutil"
+	"net/http"
+	"strings"
 )
 
 type NameUrlRequest struct {
@@ -25,45 +31,45 @@ func NewNamesResource(interactor uc.NameInteractor) NamesResource {
 	}
 }
 
-func (t namesResourceImpl) Register(container *restful.Container) {
-	ws := new(restful.WebService)
-	ws.Path("/names").
-		Doc("Manage Names").
-		Consumes(restful.MIME_JSON).
-		Produces(restful.MIME_JSON)
+func (t namesResourceImpl) Register(router *mux.Router) {
+	router.Methods("GET").
+		Path("/{name:[A-Za-z0-9]+}").
+		HandlerFunc(t.RetrieveName)
 
-	ws.Route(ws.PUT("/{name}").To(t.UpdateURLForName).
-		Doc("update a url for name").
-		Operation("updateURLForName").
-		Param(ws.PathParameter("name", "name of person").DataType("string")).
-		Returns(400, "malformed request", nil).
-		Reads(NameUrlRequest{}))
+	router.Methods("PUT").
+		Path("/{name:[A-Za-z0-9]+}").
+		Headers(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON).
+		HandlerFunc(t.UpdateURLForName)
 
-	ws.Route(ws.GET("/{name}").To(t.RetrieveName).
-		Doc("Retrieve a name").
-		Operation("retrieveName").
-		Param(ws.PathParameter("name", "name of person").DataType("string")).
-		Returns(400, "invalid name", nil).
-		Returns(404, "name does not exist", nil).
-		Writes(NameUrlResponse{}))
-
-	ws.Route(ws.DELETE("").To(t.RemoveAllNames).
-		Doc("delete all names").
-		Operation("removeAllNames").
-		Param(ws.PathParameter("name", "name of person").DataType("string")))
-
-	container.Add(ws)
+	router.Methods("DELETE").
+		HandlerFunc(t.RemoveAllNames)
 }
 
-func getRequestName(req *restful.Request) (Name, error) {
-	name := Name(req.PathParameter("name"))
+func ReadPayload(request *http.Request, pointer interface{}) error {
+	contentType := request.Header.Get(HEADER_CONTENT_TYPE)
+
+	if strings.Contains(contentType, CONTENT_TYPE_JSON) {
+		buffer, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return err
+		}
+		decoder := json.NewDecoder(bytes.NewReader(buffer))
+		decoder.UseNumber()
+		return decoder.Decode(pointer)
+	}
+	return fmt.Errorf("Unable to unmarshal JSON payload")
+}
+
+func getRequestName(request *http.Request) (Name, error) {
+	params := mux.Vars(request)
+	name := Name(params["name"])
 	if err := name.Validate(); err != nil {
 		return "", err
 	}
 	return name, nil
 }
 
-func (t namesResourceImpl) UpdateURLForName(request *restful.Request, response *restful.Response) {
+func (t namesResourceImpl) UpdateURLForName(response http.ResponseWriter, request *http.Request) {
 	name, err := getRequestName(request)
 	if err != nil {
 		ERROR(response, err)
@@ -71,7 +77,7 @@ func (t namesResourceImpl) UpdateURLForName(request *restful.Request, response *
 	}
 
 	var nameRequest NameUrlRequest
-	if err := request.ReadEntity(&nameRequest); err != nil {
+	if err := ReadPayload(request, &nameRequest); err != nil {
 		ERROR(response, err)
 		return
 	}
@@ -81,11 +87,11 @@ func (t namesResourceImpl) UpdateURLForName(request *restful.Request, response *
 		return
 	}
 
-	OK(response, nil)
+	OK(response, "")
 	return
 }
 
-func (t namesResourceImpl) RetrieveName(request *restful.Request, response *restful.Response) {
+func (t namesResourceImpl) RetrieveName(response http.ResponseWriter, request *http.Request) {
 	name, err := getRequestName(request)
 	if err != nil {
 		ERROR(response, err)
@@ -107,12 +113,12 @@ func (t namesResourceImpl) RetrieveName(request *restful.Request, response *rest
 	return
 }
 
-func (t namesResourceImpl) RemoveAllNames(request *restful.Request, response *restful.Response) {
+func (t namesResourceImpl) RemoveAllNames(response http.ResponseWriter, request *http.Request) {
 	if err := t.interactor.DeleteAllNames(); err != nil {
 		ERROR(response, err)
 		return
 	}
 
-	OK(response, nil)
+	OK(response, "")
 	return
 }

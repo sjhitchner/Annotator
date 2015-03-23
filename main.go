@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/emicklei/go-restful"
 	"github.com/sjhitchner/sourcegraph/infrastructure"
 	//"github.com/sjhitchner/sourcegraph/interfaces"
+	"github.com/gorilla/mux"
 	uc "github.com/sjhitchner/sourcegraph/usecases"
 	"log"
 	"net/http"
@@ -26,18 +26,25 @@ POST /annotate
 */
 
 func main() {
-	wsContainer := restful.NewContainer()
 
+	router := mux.NewRouter()
 	store := infrastructure.NewNameRepository()
 	interactor := uc.NewAnnotationInteractor(store)
 
 	namesResource := infrastructure.NewNamesResource(interactor)
-	namesResource.Register(wsContainer)
+	namesResource.Register(router.PathPrefix("/names").Subrouter())
 
 	annotateResource := infrastructure.NewAnnotateResource(interactor)
-	annotateResource.Register(wsContainer)
+	annotateResource.Register(router.PathPrefix("/annotate").Subrouter())
+
+	router.Path("/ping").
+		Methods("GET").
+		HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
+		response.Write([]byte("pong"))
+	})
+
+	http.Handle("/", router)
 
 	log.Printf("Started listening on localhost:3001")
-	server := &http.Server{Addr: ":3001", Handler: wsContainer}
-	log.Fatal(server.ListenAndServe())
+	log.Fatal(http.ListenAndServe(":3001", nil))
 }

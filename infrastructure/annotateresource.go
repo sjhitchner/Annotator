@@ -1,9 +1,11 @@
 package infrastructure
 
 import (
-	"github.com/emicklei/go-restful"
+	"github.com/gorilla/mux"
 	uc "github.com/sjhitchner/sourcegraph/usecases"
+	"io/ioutil"
 	"log"
+	"net/http"
 )
 
 type AnnotateRequest struct {
@@ -20,23 +22,30 @@ func NewAnnotateResource(interactor uc.AnnotateInteractor) AnnotateResource {
 	}
 }
 
-func (t annotateResourceImpl) Register(container *restful.Container) {
-	ws := new(restful.WebService)
-	ws.Path("/annotate").
-		Doc("Manage Annotations")
-	//("plain/html", "").
-	//Produces("plain/html")
-
-	ws.Route(ws.POST("").To(t.AnnotateHTML).
-		Doc("update a url for name").
-		Operation("updateURLForName").
-		Param(ws.PathParameter("name", "name of person").DataType("string")).
-		Returns(400, "malformed request", nil).
-		Reads(AnnotateRequest{}))
-
-	container.Add(ws)
+func (t annotateResourceImpl) Register(router *mux.Router) {
+	router.Methods("POST").
+		Headers(HEADER_CONTENT_TYPE, CONTENT_TYPE_TEXT).
+		HandlerFunc(t.AnnotateHTML)
+	router.Methods("POST").
+		Headers(HEADER_CONTENT_TYPE, CONTENT_TYPE_HTML).
+		HandlerFunc(t.AnnotateHTML)
 }
 
-func (t annotateResourceImpl) AnnotateHTML(request *restful.Request, response *restful.Response) {
+func (t annotateResourceImpl) AnnotateHTML(resp http.ResponseWriter, req *http.Request) {
 	log.Println("annotate")
+
+	buffer, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		ERROR(resp, err)
+		return
+	}
+
+	html, err := t.interactor.AnnotateHTML(string(buffer))
+	if err != nil {
+		ERROR(resp, err)
+		return
+	}
+
+	OK(resp, html)
+	return
 }

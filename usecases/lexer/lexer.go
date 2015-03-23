@@ -1,42 +1,41 @@
 package lexer
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 	"unicode/utf8"
 )
 
 const (
-	itemError itemType = iota
-	itemEOF
-	itemName
-	itemText
-	itemHyperlink
-	itemLeftHyper
-	itemRightHyper
+	ItemError ItemType = iota
+	ItemEOF
+	ItemName
+	ItemText
+	ItemHyperlink
+	ItemLeftHyper
+	ItemRightHyper
 
 	eof = -1
 )
 
-type itemType int
+type ItemType int
 
-type item struct {
-	typ   itemType
-	value string
+type Item struct {
+	Type  ItemType
+	Value string
 }
 
-func (t item) String() string {
-	switch t.typ {
-	case itemEOF:
+func (t Item) String() string {
+	switch t.Type {
+	case ItemEOF:
 		return "EOF"
-	case itemError:
-		return t.value
+	case ItemError:
+		return t.Value
 	}
-	if len(t.value) > 50 {
-		return fmt.Sprintf("%d:%.50q...", t.typ, t.value)
+	if len(t.Value) > 50 {
+		return fmt.Sprintf("%d:%.50q...", t.Type, t.Value)
 	}
-	return fmt.Sprintf("%d:%q", t.typ, t.value)
+	return fmt.Sprintf("%d:%q", t.Type, t.Value)
 }
 
 type stateFunction func(*lexer) stateFunction
@@ -48,7 +47,7 @@ type lexer struct {
 	pos   int
 	width int
 	state stateFunction
-	items chan item
+	items chan Item
 }
 
 // No copying, just a slice
@@ -56,13 +55,13 @@ type lexer struct {
 func NewLexer(input string) *lexer {
 	l := &lexer{
 		input: input,
-		items: make(chan item, 2),
+		items: make(chan Item, 2),
 		state: lexName,
 	}
 	return l
 }
 
-func (t *lexer) NextItem() item {
+func (t *lexer) NextItem() Item {
 	for {
 		select {
 		case item := <-t.items:
@@ -74,15 +73,8 @@ func (t *lexer) NextItem() item {
 	panic("should never get here")
 }
 
-func (t *lexer) run() {
-	for state := lexName; state != nil; {
-		state = state(t)
-	}
-	close(t.items)
-}
-
-func (t *lexer) emit(i itemType) {
-	t.items <- item{i, t.input[t.start:t.pos]}
+func (t *lexer) emit(i ItemType) {
+	t.items <- Item{i, t.input[t.start:t.pos]}
 	t.start = t.pos
 }
 
@@ -99,7 +91,7 @@ func (t *lexer) next() rune {
 }
 
 func (t *lexer) errorf(format string, args ...interface{}) stateFunction {
-	t.items <- item{itemError, fmt.Sprintf(format, args...)}
+	t.items <- Item{ItemError, fmt.Sprintf(format, args...)}
 	return nil
 }
 
@@ -121,7 +113,7 @@ func lexName(l *lexer) stateFunction {
 	for {
 		if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
 			if l.pos > l.start {
-				l.emit(itemName)
+				l.emit(ItemName)
 			}
 			return lexLeftHyperlink
 		}
@@ -132,7 +124,7 @@ func lexName(l *lexer) stateFunction {
 
 		if !IsAlphaNumeric(l.input[l.pos]) {
 			if l.pos > l.start {
-				l.emit(itemName)
+				l.emit(ItemName)
 			}
 			return lexText
 		}
@@ -146,10 +138,10 @@ func lexName(l *lexer) stateFunction {
 	}
 
 	if l.pos > l.start {
-		l.emit(itemName)
+		l.emit(ItemName)
 	}
 
-	l.emit(itemEOF)
+	l.emit(ItemEOF)
 
 	return nil
 }
@@ -161,7 +153,7 @@ func lexLeftHyperlink(l *lexer) stateFunction {
 
 func lexRightHyperlink(l *lexer) stateFunction {
 	l.pos += len(RIGHT_HYPER)
-	l.emit(itemHyperlink)
+	l.emit(ItemHyperlink)
 	return lexName
 }
 
@@ -192,13 +184,13 @@ func lexText(l *lexer) stateFunction {
 	for {
 		if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
 			if l.pos > l.start {
-				l.emit(itemText)
+				l.emit(ItemText)
 			}
 			return lexLeftHyperlink
 		}
 		if IsAlphaNumeric(l.input[l.pos]) {
 			if l.pos > l.start {
-				l.emit(itemText)
+				l.emit(ItemText)
 			}
 			return lexName
 		}
@@ -212,10 +204,10 @@ func lexText(l *lexer) stateFunction {
 	}
 
 	if l.pos > l.start {
-		l.emit(itemText)
+		l.emit(ItemText)
 	}
 
-	l.emit(itemEOF)
+	l.emit(ItemEOF)
 
 	return nil
 }
