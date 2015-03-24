@@ -30,7 +30,6 @@ func init() {
 	nameRegex.Longest()
 
 	urlRegex = regexp.MustCompile(URLRegex)
-	//urlRegex.Longest()
 }
 
 type Validator interface {
