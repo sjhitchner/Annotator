@@ -50,6 +50,9 @@ func (t annotateInteractorImpl) AnnotateHTML(html string) (string, error) {
 }
 
 /*
+
+"<div><ul><li>alex</li><li>bo</li><li>bob</li><li>casey</li></ul></div><div><p>this is paragraph 1 about alex.</p><p>alex's paragraph number 2.</p><p>and some closing remarks about alex</p></div>"
+
 func main() {
 	str := "steve h    alex.com <a href=\"qwerty\">qwerty</a> qwerty"
 	if str2, err := Annotate(str); err == nil {
