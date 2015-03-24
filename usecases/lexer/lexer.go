@@ -11,11 +11,8 @@ const (
 	ItemEOF
 	ItemName
 	ItemText
-	ItemLeftAngle
-	ItemRightAngle
+	ItemHTML
 	ItemHyperlink
-	ItemLeftHyper
-	ItemRightHyper
 
 	eof = -1
 )
@@ -80,6 +77,12 @@ func (t *lexer) emit(i ItemType) {
 	t.start = t.pos
 }
 
+func (l *lexer) peek() rune {
+	r := l.next()
+	l.pos -= l.width
+	return r
+}
+
 func (t *lexer) next() rune {
 	r, w := utf8.DecodeRuneInString(t.input[t.pos:])
 	t.width = w
@@ -104,7 +107,7 @@ const (
 	RIGHT_HYPER = "</a>"
 )
 
-//State Functions
+// State Functions
 //
 // States
 //  Alphanumeric String (possible Name)
@@ -115,18 +118,18 @@ const (
 // Parses out alphanumeric names
 func lexName(l *lexer) stateFunction {
 	for {
-		if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
+		if strings.HasPrefix(l.input[l.pos:], LEFT_ANGLE) {
 			if l.pos > l.start {
 				l.emit(ItemName)
 			}
-			return lexLeftHyperlink
+			return lexLeftHTML
 		}
 
-		if strings.HasPrefix(l.input[l.pos:], RIGHT_HYPER) {
+		if strings.HasPrefix(l.input[l.pos:], RIGHT_ANGLE) {
 			return l.errorf("Invalid HTML Snippet")
 		}
 
-		if !IsAlphaNumeric(l.input[l.pos]) {
+		if !IsAlphaNumeric(l.peek()) {
 			if l.pos > l.start {
 				l.emit(ItemName)
 			}
@@ -146,53 +149,20 @@ func lexName(l *lexer) stateFunction {
 	}
 
 	l.emit(ItemEOF)
-
-	return nil
-}
-
-func lexLeftHyperlink(l *lexer) stateFunction {
-	l.pos += len(LEFT_HYPER)
-	return lexInsideHyperlink
-}
-
-func lexRightHyperlink(l *lexer) stateFunction {
-	l.pos += len(RIGHT_HYPER)
-	l.emit(ItemHyperlink)
-	return lexName
-}
-
-// Parsers out hyperlinks
-func lexInsideHyperlink(l *lexer) stateFunction {
-	for {
-		if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
-			return l.errorf("Invalid HTML Snippet")
-		}
-
-		if strings.HasPrefix(l.input[l.pos:], RIGHT_HYPER) {
-			return lexRightHyperlink
-		}
-
-		r := l.next()
-		if r == '\n' || r == '\r' {
-			return l.errorf("Invalid HTML Snippet - has line break")
-		} else if r == eof {
-			return l.errorf("Invalid HTML Snippet - unclosed hyperlink")
-			break
-		}
-	}
 	return nil
 }
 
 // Parsers out non-name text
 func lexText(l *lexer) stateFunction {
 	for {
-		if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
+		if strings.HasPrefix(l.input[l.pos:], LEFT_ANGLE) {
 			if l.pos > l.start {
 				l.emit(ItemText)
 			}
-			return lexLeftHyperlink
+			return lexLeftHTML
 		}
-		if IsAlphaNumeric(l.input[l.pos]) {
+
+		if IsAlphaNumeric(l.peek()) {
 			if l.pos > l.start {
 				l.emit(ItemText)
 			}
@@ -212,13 +182,78 @@ func lexText(l *lexer) stateFunction {
 	}
 
 	l.emit(ItemEOF)
-
 	return nil
 }
 
-// Help Functions
+func lexLeftHTML(l *lexer) stateFunction {
+	if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
+		l.pos += len(LEFT_HYPER)
+		return lexInsideHyperlink
+	}
+	l.pos += len(LEFT_ANGLE)
+	return lexInsideHTML
+}
 
-func IsAlphaNumeric(i uint8) bool {
-	r := rune(i)
+func lexRightHTML(l *lexer) stateFunction {
+	l.pos += len(RIGHT_ANGLE)
+	l.emit(ItemHTML)
+	return lexName
+}
+
+func lexLeftHyperlink(l *lexer) stateFunction {
+	l.pos += len(LEFT_HYPER)
+	return lexInsideHyperlink
+}
+
+func lexRightHyperlink(l *lexer) stateFunction {
+	l.pos += len(RIGHT_HYPER)
+	l.emit(ItemHyperlink)
+	return lexName
+}
+
+// Parsers out hyperlinks
+func lexInsideHyperlink(l *lexer) stateFunction {
+	for {
+		if strings.HasPrefix(l.input[l.pos:], LEFT_HYPER) {
+			return l.errorf("Invalid Hyperlink Snippet")
+		}
+
+		if strings.HasPrefix(l.input[l.pos:], RIGHT_HYPER) {
+			return lexRightHyperlink
+		}
+
+		r := l.next()
+		if r == '\n' || r == '\r' {
+			return l.errorf("Invalid HTML Snippet - has line break")
+		} else if r == eof {
+			return l.errorf("Invalid HTML Snippet - unclosed hyperlink")
+			break
+		}
+	}
+	return nil
+}
+
+func lexInsideHTML(l *lexer) stateFunction {
+	for {
+		if strings.HasPrefix(l.input[l.pos:], LEFT_ANGLE) {
+			return l.errorf("Invalid HTML Snippet")
+		}
+
+		if strings.HasPrefix(l.input[l.pos:], RIGHT_ANGLE) {
+			return lexRightHTML
+		}
+
+		r := l.next()
+		if r == '\n' || r == '\r' {
+			return l.errorf("Invalid HTML Snippet - has line break")
+		} else if r == eof {
+			return l.errorf("Invalid HTML Snippet - unclosed tag")
+			break
+		}
+	}
+	return nil
+}
+
+func IsAlphaNumeric(r rune) bool {
 	return 'A' <= r && r <= 'Z' || 'a' <= r && r <= 'z' || '0' <= r && r <= '9'
 }
