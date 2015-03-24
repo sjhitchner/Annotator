@@ -14,6 +14,14 @@ Solution Discussion
 	usescases/lexer 
 		parses HTML snippets
 
+### Build and Installation
+
+Run the build.sh file located in the repository root.  This script will download and install
+all dependencies using the Go package manager, build and install the binary in
+$GOPATH/bin/annotator.
+
+This script assumes you have a Go project directory and correctly set GOPATH environment
+variable (https://golang.org/doc/install#gopath).
 
 ### Data Backend
 
