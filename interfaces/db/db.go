@@ -2,11 +2,9 @@ package db
 
 import (
 	"fmt"
-	. "github.com/sjhitchner/sourcegraph/domain"
+	. "github.com/sjhitchner/annotator/domain"
 	"sync"
 )
-
-//NOTES: Mutex contention for adding
 
 type mapBasedNameRepositoryImpl struct {
 	sync.RWMutex

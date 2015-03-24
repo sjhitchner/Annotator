@@ -2,8 +2,8 @@ package rest
 
 import (
 	"github.com/gorilla/mux"
-	. "github.com/sjhitchner/sourcegraph/domain"
-	uc "github.com/sjhitchner/sourcegraph/usecases"
+	. "github.com/sjhitchner/annotator/domain"
+	uc "github.com/sjhitchner/annotator/usecases"
 	"net/http"
 )
 

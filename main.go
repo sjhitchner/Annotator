@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/sjhitchner/sourcegraph/interfaces/db"
-	"github.com/sjhitchner/sourcegraph/interfaces/rest"
-	uc "github.com/sjhitchner/sourcegraph/usecases"
+	"github.com/sjhitchner/annotator/interfaces/db"
+	"github.com/sjhitchner/annotator/interfaces/rest"
+	uc "github.com/sjhitchner/annotator/usecases"
 	"log"
 	"net/http"
 )

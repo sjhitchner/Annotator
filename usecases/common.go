@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	. "github.com/sjhitchner/sourcegraph/domain"
+	. "github.com/sjhitchner/annotator/domain"
 )
 
 type NamesInteractor interface {

@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	. "github.com/sjhitchner/sourcegraph/domain"
-	"github.com/sjhitchner/sourcegraph/interfaces/db"
+	. "github.com/sjhitchner/annotator/domain"
+	"github.com/sjhitchner/annotator/interfaces/db"
 	"testing"
 )
 

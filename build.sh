@@ -6,7 +6,11 @@ if [ -z "$GOPATH" ]; then
 fi
 
 # Install third party packages
+echo "Installing Dependencies"
 go get github.com/gorilla/mux
 
 # Compile and install
-go install github.com/sjhitchner/sourcegraph 
+echo "Building source..."
+go install github.com/sjhitchner/annotator
+
+echo "Run $GOPATH/bin/annotator"

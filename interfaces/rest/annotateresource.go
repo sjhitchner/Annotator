@@ -2,7 +2,7 @@ package rest
 
 import (
 	"github.com/gorilla/mux"
-	uc "github.com/sjhitchner/sourcegraph/usecases"
+	uc "github.com/sjhitchner/annotator/usecases"
 	"io/ioutil"
 	"log"
 	"net/http"

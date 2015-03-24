@@ -3,8 +3,8 @@ package usecases
 import (
 	"bytes"
 	"fmt"
-	. "github.com/sjhitchner/sourcegraph/domain"
-	"github.com/sjhitchner/sourcegraph/usecases/lexer"
+	. "github.com/sjhitchner/annotator/domain"
+	"github.com/sjhitchner/annotator/usecases/lexer"
 	"strings"
 )
 

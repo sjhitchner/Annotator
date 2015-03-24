@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
-	. "github.com/sjhitchner/sourcegraph/domain"
+	. "github.com/sjhitchner/annotator/domain"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
