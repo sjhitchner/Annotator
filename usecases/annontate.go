@@ -9,10 +9,10 @@ import (
 )
 
 type annotateInteractorImpl struct {
-	repo NameRepository
+	repo NamesRepository
 }
 
-func newAnnotateInteractor(repo NameRepository) AnnotateInteractor {
+func newAnnotateInteractor(repo NamesRepository) AnnotateInteractor {
 	return &annotateInteractorImpl{
 		repo,
 	}

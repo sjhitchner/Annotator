@@ -4,7 +4,7 @@ import (
 	. "github.com/sjhitchner/sourcegraph/domain"
 )
 
-type NameInteractor interface {
+type NamesInteractor interface {
 	UpdateURLForName(name Name, url URL) error
 	GetURLForName(name Name) (URL, error)
 	DeleteAllNames() error
@@ -15,20 +15,18 @@ type AnnotateInteractor interface {
 }
 
 type AnnotationInteractor interface {
-	NameInteractor
+	NamesInteractor
 	AnnotateInteractor
 }
 
 type annotationInteractor struct {
-	//nameInteractorImpl
-	//annotateInteractorImpl
-	NameInteractor
+	NamesInteractor
 	AnnotateInteractor
 }
 
-func NewAnnotationInteractor(repo NameRepository) AnnotationInteractor {
+func NewAnnotationInteractor(repo NamesRepository) AnnotationInteractor {
 	return &annotationInteractor{
-		newNameInteractor(repo),
+		newNamesInteractor(repo),
 		newAnnotateInteractor(repo),
 	}
 }

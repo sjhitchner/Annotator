@@ -5,17 +5,17 @@ import (
 	"log"
 )
 
-type nameInteractorImpl struct {
-	repo NameRepository
+type namesInteractorImpl struct {
+	repo NamesRepository
 }
 
-func newNameInteractor(repo NameRepository) NameInteractor {
-	return &nameInteractorImpl{
+func newNamesInteractor(repo NamesRepository) NamesInteractor {
+	return &namesInteractorImpl{
 		repo,
 	}
 }
 
-func (t nameInteractorImpl) UpdateURLForName(name Name, url URL) error {
+func (t namesInteractorImpl) UpdateURLForName(name Name, url URL) error {
 	log.Printf("UpdateURLForName [%s] [%s]\n", name, url)
 
 	if err := name.Validate(); err != nil {
@@ -29,7 +29,7 @@ func (t nameInteractorImpl) UpdateURLForName(name Name, url URL) error {
 	return t.repo.Put(name, url)
 }
 
-func (t nameInteractorImpl) GetURLForName(name Name) (URL, error) {
+func (t namesInteractorImpl) GetURLForName(name Name) (URL, error) {
 	log.Printf("GetURLForName [%s]\n", name)
 
 	if err := name.Validate(); err != nil {
@@ -44,7 +44,7 @@ func (t nameInteractorImpl) GetURLForName(name Name) (URL, error) {
 	return url, nil
 }
 
-func (t nameInteractorImpl) DeleteAllNames() error {
+func (t namesInteractorImpl) DeleteAllNames() error {
 	log.Printf("DeleteAllNames\n")
 
 	return t.repo.DeleteAll()

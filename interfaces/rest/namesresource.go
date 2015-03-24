@@ -1,15 +1,10 @@
-package infrastructure
+package rest
 
 import (
-	"bytes"
-	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	. "github.com/sjhitchner/sourcegraph/domain"
 	uc "github.com/sjhitchner/sourcegraph/usecases"
-	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 type NameUrlRequest struct {
@@ -22,10 +17,10 @@ type NameUrlResponse struct {
 }
 
 type namesResourceImpl struct {
-	interactor uc.NameInteractor
+	interactor uc.NamesInteractor
 }
 
-func NewNamesResource(interactor uc.NameInteractor) NamesResource {
+func NewNamesResource(interactor uc.NamesInteractor) NamesResource {
 	return namesResourceImpl{
 		interactor,
 	}
@@ -43,21 +38,6 @@ func (t namesResourceImpl) Register(router *mux.Router) {
 
 	router.Methods("DELETE").
 		HandlerFunc(t.RemoveAllNames)
-}
-
-func ReadPayload(request *http.Request, pointer interface{}) error {
-	contentType := request.Header.Get(HEADER_CONTENT_TYPE)
-
-	if strings.Contains(contentType, CONTENT_TYPE_JSON) {
-		buffer, err := ioutil.ReadAll(request.Body)
-		if err != nil {
-			return err
-		}
-		decoder := json.NewDecoder(bytes.NewReader(buffer))
-		decoder.UseNumber()
-		return decoder.Decode(pointer)
-	}
-	return fmt.Errorf("Unable to unmarshal JSON payload")
 }
 
 func getRequestName(request *http.Request) (Name, error) {

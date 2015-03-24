@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 	. "github.com/sjhitchner/sourcegraph/domain"
-	uc "github.com/sjhitchner/sourcegraph/usecases"
 	"sync"
 )
 
@@ -14,7 +13,7 @@ type nameRepositoryImpl struct {
 	mapper map[Name]URL
 }
 
-func NewNameRepository() NamesRepository {
+func NewNamesRepository() NamesRepository {
 	return &nameRepositoryImpl{
 		sync.RWMutex{},
 		make(map[Name]URL),

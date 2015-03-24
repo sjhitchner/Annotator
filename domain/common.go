@@ -12,7 +12,7 @@ const (
 	MALFORMED_ERROR = "malformed"
 )
 
-type NameRepository interface {
+type NamesRepository interface {
 	Get(name Name) (URL, error)
 	Put(name Name, url URL) error
 	DeleteAll() error

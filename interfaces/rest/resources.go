@@ -1,9 +1,12 @@
-package infrastructure
+package rest
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	. "github.com/sjhitchner/sourcegraph/domain"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -30,6 +33,21 @@ type NamesResource interface {
 type AnnotateResource interface {
 	Resource
 	AnnotateHTML(resp http.ResponseWriter, req *http.Request)
+}
+
+func ReadPayload(request *http.Request, pointer interface{}) error {
+	contentType := request.Header.Get(HEADER_CONTENT_TYPE)
+
+	if strings.Contains(contentType, CONTENT_TYPE_JSON) {
+		buffer, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			return err
+		}
+		decoder := json.NewDecoder(bytes.NewReader(buffer))
+		decoder.UseNumber()
+		return decoder.Decode(pointer)
+	}
+	return fmt.Errorf("Unable to unmarshal JSON payload")
 }
 
 func OK(response http.ResponseWriter, payload interface{}) {

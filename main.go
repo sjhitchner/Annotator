@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/sjhitchner/sourcegraph/infrastructure"
-	//"github.com/sjhitchner/sourcegraph/interfaces"
 	"github.com/gorilla/mux"
+	"github.com/sjhitchner/sourcegraph/interfaces/db"
+	"github.com/sjhitchner/sourcegraph/interfaces/rest"
 	uc "github.com/sjhitchner/sourcegraph/usecases"
 	"log"
 	"net/http"
@@ -28,13 +28,13 @@ POST /annotate
 func main() {
 
 	router := mux.NewRouter()
-	store := infrastructure.NewNameRepository()
+	store := db.NewNamesRepository()
 	interactor := uc.NewAnnotationInteractor(store)
 
-	namesResource := infrastructure.NewNamesResource(interactor)
+	namesResource := rest.NewNamesResource(interactor)
 	namesResource.Register(router.PathPrefix("/names").Subrouter())
 
-	annotateResource := infrastructure.NewAnnotateResource(interactor)
+	annotateResource := rest.NewAnnotateResource(interactor)
 	annotateResource.Register(router.PathPrefix("/annotate").Subrouter())
 
 	router.Path("/ping").
