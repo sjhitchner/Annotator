@@ -63,19 +63,18 @@ GET		/names/{name:[A-Za-z0-9]+} => [RetrieveName()](https://github.com/sjhitchne
 
 PUT		/names/{name:[A-Za-z0-9]+} => [UpdateURLForName()](https://github.com/sjhitchner/annotator/blob/master/interfaces/rest/namesresource.go)
 
-	Implemented by namesResourceImpl.
 	Complexity: O(1), underlying implementation uses a map, constant time insert
 	Space: O(n), underlying implementation uses a map.
 
 
 DELETE	/names  => [RemoveAllNames()](https://github.com/sjhitchner/annotator/blob/master/interfaces/rest/namesresource.go)
+
 	Complexity: O(n), underlying implementation uses a map, need to iterate map to delete all records
 	Space: O(n), underlying implementation uses a map.
 
 
 POST	/annotate => [AnnotateHTML()](https://github.com/sjhitchner/annotator/blob/master/interfaces/rest/annotateresource.go)
 
-	Implemented by annotateInteractorImpl., using a custom lexer
 	Complexity: O(n), Lexer (see below) requires a single pass of the string
 	Space: O(2n)->O(n), Using Go slices, no part of the string being lexed is
 		copied. To build the final annotated string a string buffer is created
