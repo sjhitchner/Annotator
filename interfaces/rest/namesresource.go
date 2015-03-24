@@ -32,7 +32,6 @@ func (t namesResourceImpl) Register(router *mux.Router) {
 		HandlerFunc(t.RetrieveName)
 
 	router.Methods("PUT").
-		//Path("/{name:[A-Za-z0-9]+}").
 		Path("/{name}").
 		Headers(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON).
 		HandlerFunc(t.UpdateURLForName)
