@@ -11,7 +11,10 @@ import (
 
 func main() {
 
+	// Create new Gorilla mux router
 	router := mux.NewRouter()
+
+	// Create a names repository and Annotation Interactor
 	store := db.NewNamesRepository()
 	interactor := uc.NewAnnotationInteractor(store)
 

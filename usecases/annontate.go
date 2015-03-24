@@ -40,46 +40,13 @@ func (t annotateInteractorImpl) AnnotateHTML(html string) (string, error) {
 			if err == nil {
 				b.WriteString(`</a>`)
 			}
+
 		case lexer.ItemError:
 			return "", fmt.Errorf(token.Value)
+
 		default:
 			b.WriteString(token.Value)
 		}
 	}
 	return strings.TrimSpace(b.String()), nil
 }
-
-/*
-
-"<div><ul><li>alex</li><li>bo</li><li>bob</li><li>casey</li></ul></div><div><p>this is paragraph 1 about alex.</p><p>alex's paragraph number 2.</p><p>and some closing remarks about alex</p></div>"
-
-func main() {
-	str := "steve h    alex.com <a href=\"qwerty\">qwerty</a> qwerty"
-	if str2, err := Annotate(str); err == nil {
-		fmt.Println("RESULT:", str2)
-	} else {
-		fmt.Println("ERROR:", err)
-	}
-}
-
-func Annotate(str string) (string, error) {
-	var b bytes.Buffer
-
-	lexer := NewLexer(str)
-	for token := lexer.NextItem(); token.typ != itemEOF; {
-		fmt.Println(token)
-
-		switch token.typ {
-		case itemName:
-			b.WriteString("<a href=\"\">")
-			b.WriteString(token.value)
-			b.WriteString("</a>")
-		case itemError:
-			return "", fmt.Errorf(token.value)
-		default:
-			b.WriteString(token.value)
-		}
-	}
-	return b.String(), nil
-}
-*/

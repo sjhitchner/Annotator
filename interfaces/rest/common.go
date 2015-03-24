@@ -81,11 +81,13 @@ func OK(response http.ResponseWriter, payload interface{}) {
 }
 
 func ERROR(response http.ResponseWriter, err error) {
+
 	if strings.Contains(err.Error(), NOT_FOUND_ERROR) {
 		response.WriteHeader(http.StatusNotFound)
 		response.Write([]byte(err.Error()))
 		return
 	}
+
 	if strings.Contains(err.Error(), MALFORMED_ERROR) {
 		response.WriteHeader(http.StatusBadRequest)
 		response.Write([]byte(err.Error()))

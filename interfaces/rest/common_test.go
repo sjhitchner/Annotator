@@ -1,12 +1,11 @@
 package rest
 
 import (
-	"github.com/gorilla/mux"
-	. "github.com/sjhitchner/sourcegraph/domain"
-	//. "github.com/sjhitchner/sourcegraph/usecases"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
+	. "github.com/sjhitchner/sourcegraph/domain"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"

@@ -1,3 +1,84 @@
+Solution Discussion
+=================================
+
+## Architecture
+
+domain/
+	common types and interfaces
+interfaces/
+	data layer
+	rest interface
+usecases/
+	main business logic
+usescases/lexer 
+	parses HTML snippets
+
+### Domain
+
+Domain contains common types and interfaces that are shared across the entire 
+project. The main shared interface being NamesRepository that defines how 
+data (in this case name/URL pairs) are accessed.
+
+### Interfaces
+
+#### Data
+
+The current data layer (mapBasedNameRepositoryImpl) is simple and implemented
+using a standard map and implements the NamesRepository interface.
+
+The space complexity using a map is O(n)
+The time complexity of insert and get is O(1)
+
+Currently, the number of names/urls stored is limited by the memory of the computer.  If the number of name/url pairs exceeds a new access layer can be
+built as long as it conforms to the NamesRepository interface to use Postgres
+Redis or another persistance layer.
+
+#### Rest
+
+GET		/names/{name:[A-Za-z0-9]+}
+	Implemented by namesResourceImpl.RetrieveName()
+
+
+
+	space and runtime complexities
+
+
+PUT		/names/{name:[A-Za-z0-9]+}
+	Implemented by namesResourceImpl.UpdateURLForName()
+
+
+
+DELETE	/names
+	Implemented by namesResourceImpl.RemoveAllNames()
+
+
+
+### Lexer
+
+Basic Lexer is used to parse the HTML strings for annotation.  The
+lexer is based off the Golang template parser implementation as
+described by Rob Pike (https://www.youtube.com/watch?v=HxaD_trXwRE).
+
+It parses the string in linear time and returns slices for processing
+meaning that no memory is copied or needed. There is a bit of overhead
+with the internal channel that is used to communicate lexemes which
+could be removed by using a buffer, but the channel implementation is
+cleaner.  Additional memory is only allocated in a string buffer to
+rebuild the the HTML snippet with the added hyperlinks.
+
+The Lexer consists of a state machine which makes implementation
+rather simple and makes extending it rather trivial.  In fact, I
+initially read the problem description incorrectly and my first
+implementation did not handle arbitrary HTML tags.  Adding an
+additional state to correctly handle HTML tags was relatively easy.
+This extensibility makes up for the initial complexity.
+
+
+
+
+
+
+
 Sourcegraph programming challenge
 =================================
 

@@ -8,19 +8,19 @@ import (
 
 //NOTES: Mutex contention for adding
 
-type nameRepositoryImpl struct {
+type mapBasedNameRepositoryImpl struct {
 	sync.RWMutex
 	mapper map[Name]URL
 }
 
 func NewNamesRepository() NamesRepository {
-	return &nameRepositoryImpl{
+	return &mapBasedNameRepositoryImpl{
 		sync.RWMutex{},
 		make(map[Name]URL),
 	}
 }
 
-func (t nameRepositoryImpl) Get(name Name) (URL, error) {
+func (t mapBasedNameRepositoryImpl) Get(name Name) (URL, error) {
 	t.RLock()
 	defer t.RUnlock()
 
@@ -31,7 +31,7 @@ func (t nameRepositoryImpl) Get(name Name) (URL, error) {
 	return url, nil
 }
 
-func (t *nameRepositoryImpl) Put(name Name, url URL) error {
+func (t *mapBasedNameRepositoryImpl) Put(name Name, url URL) error {
 	t.Lock()
 	defer t.Unlock()
 
@@ -39,7 +39,7 @@ func (t *nameRepositoryImpl) Put(name Name, url URL) error {
 	return nil
 }
 
-func (t *nameRepositoryImpl) DeleteAll() error {
+func (t *mapBasedNameRepositoryImpl) DeleteAll() error {
 	t.Lock()
 	defer t.Unlock()
 
