@@ -14,18 +14,8 @@ Solution Discussion
 	usescases/lexer 
 		parses HTML snippets
 
-### Domain
 
-Domain contains common types and interfaces that are shared across the entire 
-project. The main shared interface being NamesRepository that defines how 
-data (in this case name/URL pairs) are accessed.
-
-### Interfaces
-
-The interfaces layer handles serializing to/from wire formats and 
-storage formats
-
-#### Data
+### Data Backend
 
 The current data layer (mapBasedNameRepositoryImpl) is implemented
 using a map and implements the NamesRepository interface.
@@ -42,11 +32,20 @@ The time complexity of insert and lookup is O(1).
 
 Currently, the number of names/urls stored is limited by the memory of the computer.  If the number of name/url pairs exceeds available memory a new access layer can be implemented providing it conforms to the NamesRepository interface.  Postgres, Redis or another persistance layer could be used, this will affect the stated time and space complexity.
 
-Also, if it is known that the name will be long and have a reasonable amount
-of overlapping prefixes a prefix trie (http://en.wikipedia.org/wiki/Trie) can
-be used to improve space complexity by sacrificing time complexity. 
 
-#### Rest
+#### Alternative Data Backend
+
+Another implementation option for the data layer could be Trie or prefix tree 
+(http://en.wikipedia.org/wiki/Trie).  Tries are sometimes good replacements for
+hash tables, eliminating the need for a hash function and provide alphabetical ordering
+or keys.  The worst case look up is O(N)
+Also, if it is known that the name will be long and have a reasonable amount
+of overlapping prefixes a prefix trie  can
+be used to improve space complexity by sacrificing some time complexity.  
+Worst case lookup of a trie is O(n), but does not require a hashing step and reduces 
+
+
+### API Endpoints
 
 GET		/names/{name:[A-Za-z0-9]+}
 	
@@ -72,18 +71,11 @@ DELETE	/names
 POST	/annotate
 
 	Implemented by annotateInteractorImpl.AnnotateHTML(), using a custom lexer
-	Complexity: O(n), Lexer requires a single pass of the string
+	Complexity: O(n), Lexer (see below) requires a single pass of the string
 	Space: O(2n)->O(n), Using Go slices, no part of the string being lexed is
 		copied. To build the final annotated string a string buffer is created
 		to make appending more efficient and handle adding the additional
-		hyperlinks. 
-
-
-
-### Usecases
-
-The usecases holds all business logic of the application (interactors).
-Ideally all input validation is performed here.
+		hyperlinks.
 
 
 #### Lexer
