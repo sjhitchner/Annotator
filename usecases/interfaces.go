@@ -4,12 +4,6 @@ import (
 	. "github.com/sjhitchner/sourcegraph/domain"
 )
 
-type NameRepository interface {
-	Get(name Name) (URL, error)
-	Put(name Name, url URL) error
-	DeleteAll() error
-}
-
 type NameInteractor interface {
 	UpdateURLForName(name Name, url URL) error
 	GetURLForName(name Name) (URL, error)

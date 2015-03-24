@@ -14,7 +14,7 @@ type nameRepositoryImpl struct {
 	mapper map[Name]URL
 }
 
-func NewNameRepository() uc.NameRepository {
+func NewNameRepository() NamesRepository {
 	return &nameRepositoryImpl{
 		sync.RWMutex{},
 		make(map[Name]URL),

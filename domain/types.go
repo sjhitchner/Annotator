@@ -12,6 +12,12 @@ const (
 	MALFORMED_ERROR = "malformed"
 )
 
+type NameRepository interface {
+	Get(name Name) (URL, error)
+	Put(name Name, url URL) error
+	DeleteAll() error
+}
+
 var nameRegex *regexp.Regexp
 
 func init() {
