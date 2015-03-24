@@ -25,8 +25,8 @@ variable (https://golang.org/doc/install#gopath).
 
 ### Data Backend
 
-The current data layer (mapBasedNameRepositoryImpl) is implemented
-using a map and implements the NamesRepository interface.
+The current data layer ([mapBasedNameRepositoryImpl](https://github.com/sjhitchner/annotator/blob/master/interfaces/db/db.go)) is implemented
+using a map and implements the [NamesRepository](https://github.com/sjhitchner/annotator/blob/master/domain/common.go) interface.
 
 A read/write mutex is used to ensure consistancy.  All read and write requests
 are blocked when the map is being manipulated (written to).  This will cause
