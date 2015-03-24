@@ -45,7 +45,6 @@ func (t annotateInteractorImpl) AnnotateHTML(html string) (string, error) {
 		default:
 			b.WriteString(token.Value)
 		}
-
 	}
 	return strings.TrimSpace(b.String()), nil
 }

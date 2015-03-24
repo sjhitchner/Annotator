@@ -11,6 +11,8 @@ const (
 	ItemEOF
 	ItemName
 	ItemText
+	ItemLeftAngle
+	ItemRightAngle
 	ItemHyperlink
 	ItemLeftHyper
 	ItemRightHyper
@@ -96,6 +98,8 @@ func (t *lexer) errorf(format string, args ...interface{}) stateFunction {
 }
 
 const (
+	LEFT_ANGLE  = "<"
+	RIGHT_ANGLE = ">"
 	LEFT_HYPER  = "<a"
 	RIGHT_HYPER = "</a>"
 )
