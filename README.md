@@ -84,7 +84,7 @@ POST	/annotate => [AnnotateHTML()](https://github.com/sjhitchner/annotator/blob/
 
 #### Lexer
 
-A basic Lexer is used to parse the HTML strings for annotation.  The
+A basic [Lexer](https://github.com/sjhitchner/annotator/blob/master/usecases/lexer/lexer.go) is used to parse the HTML strings for annotation.  The
 lexer is based off the Golang template parser implementation as
 described by Rob Pike (https://www.youtube.com/watch?v=HxaD_trXwRE).
 
