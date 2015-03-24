@@ -9,22 +9,6 @@ import (
 	"net/http"
 )
 
-/*
-PUT /names/[name]
-{"url": "[url goes here]"}
-
-GET /names/[name]
-{"name": "[name goes here]", "url":"[url goes here]"}
-
-DELETE /names
-
-POST /annotate
-<html>
-
-</html>
-
-*/
-
 func main() {
 
 	router := mux.NewRouter()
