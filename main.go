@@ -1,15 +1,19 @@
 package main
 
 import (
+	"flag"
 	"github.com/gorilla/mux"
 	"github.com/sjhitchner/annotator/interfaces/db"
 	"github.com/sjhitchner/annotator/interfaces/rest"
 	uc "github.com/sjhitchner/annotator/usecases"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
 
 func main() {
+	verbose := flag.Bool("verbose", false, "verbose logging")
+	flag.Parse()
 
 	// Create new Gorilla mux router
 	router := mux.NewRouter()
@@ -33,5 +37,10 @@ func main() {
 	http.Handle("/", router)
 
 	log.Printf("Started listening on localhost:3001")
+
+	if !*verbose {
+		log.SetOutput(ioutil.Discard)
+	}
+
 	log.Fatal(http.ListenAndServe(":3001", nil))
 }
